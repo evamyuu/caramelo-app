@@ -1,0 +1,22 @@
+/* Design tokens from the Figma file "Caramelo – GS2", direction v9. */
+:root {
+  --font: "Raleway", system-ui, sans-serif;
+  --ink: #2a2438;
+  --ink-soft: #4a4458;
+  --ink-muted: #6e6880;
+  --ink-faint: #8a7fa0;
+  --surface: rgb(255 255 255 / 0.75);
+  --radius-card: 28px;
+  --radius-pill: 999px;
+  --gov-blue: #1351b4;
+  --gov-green: #168821;
+  --gov-red: #e52207;
+  --gov-amber: #e8a620;
+}
+/* Ambient colour = Caramelo's state. */
+[data-mood="calm"]      { --bg-top: #faf7f3; --bg-bottom: #f3c58a; --blob: #e9def7; --chip-bg: #f1e3f1; --chip-ink: #3b2a55; --dot: #e8a620; --accent: #9a5b1e; --halo: #fbe3bd; }
+[data-mood="listening"] { --bg-top: #faf8fd; --bg-bottom: #cdb8f0; --blob: #e4d9f8; --chip-bg: #ece4fa; --chip-ink: #4b3a86; --dot: #8b6fd0; --accent: #6a4fb3; --halo: #e4d9f8; }
+[data-mood="scam"]      { --bg-top: #fbf7f6; --bg-bottom: #f2a094; --blob: #f9d9d3; --chip-bg: #fde3df; --chip-ink: #a3170a; --dot: #e52207; --accent: #a3170a; --halo: #fbd0c9; }
+[data-mood="consent"]   { --bg-top: #fcfaf5; --bg-bottom: #f5d07e; --blob: #f3e6f5; --chip-bg: #fbecc4; --chip-ink: #6b4a00; --dot: #e8a620; --accent: #8a5a00; --halo: #fbe6ae; }
+[data-mood="gov"]       { --bg-top: #f8f9fc; --bg-bottom: #bfd3f2; --blob: #dfe8f8; --chip-bg: #dde8fa; --chip-ink: #0c326f; --dot: #1351b4; --accent: #1351b4; --halo: #d5e2f7; }
+[data-mood="success"]   { --bg-top: #f8fbf8; --bg-bottom: #b9e2c3; --blob: #e6f1e9; --chip-bg: #d9f0de; --chip-ink: #0f5a18; --dot: #168821; --accent: #0f5a18; --halo: #d2ecd8; }
