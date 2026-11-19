@@ -13,7 +13,7 @@ const INTENTS: [RegExp, ScreenName][] = [
   [/rotina|agenda/, "routine"],
   [/instal|baixa|app novo|novo app/, "store"],
   [/whats|mensag|link/, "message"],
-  [/selfie|documento|identidade/, "selfie"],
+  [/selfie|biometria|reconhecimento facial|foto do rosto|documento|identidade/, "selfie"],
   [/rem[eé]dio/, "medicine"],
   [/banco|saldo|pix/, "bank"],
   [/liga/, "call"],

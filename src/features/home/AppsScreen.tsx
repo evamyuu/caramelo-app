@@ -18,7 +18,7 @@ interface AppTile {
 const CORE_TILES: AppTile[] = [
   { name: "WhatsApp", detail: "1 nova", icon: "message", color: "#168821", target: "message", badge: 1 },
   { name: "Ligar", detail: "Família e amigos", icon: "phone", color: "#1351B4", target: "call" },
-  { name: "Documento", detail: "Selfie do gov.br", icon: "face", color: "#8B6FD0", target: "selfie" },
+  { name: "Biometria", detail: "Treino da foto do rosto", icon: "face", color: "#8B6FD0", target: "selfie" },
   { name: "INSS", detail: "Fazer junto", icon: "document", color: "#0C326F", target: "cobrowse" },
   { name: "Remédios", detail: "Ler a caixa", icon: "pill", color: "#1F8A6B", target: "medicine" },
   { name: "Banco", detail: "Protegido", icon: "wallet", color: "#B5700A", target: "bank" },

@@ -3,7 +3,7 @@ import { type ComponentType, useCallback, useState } from "react";
 import { SecureSessionScreen } from "@/features/cobrowse/SecureSessionScreen";
 import { BankScreen } from "@/features/companion/BankScreen";
 import { MedicineScreen } from "@/features/companion/MedicineScreen";
-import { SelfieGuideScreen } from "@/features/documents/SelfieGuideScreen";
+import { BiometricsScreen } from "@/features/documents/BiometricsScreen";
 import { CallScreen } from "@/features/guard/CallScreen";
 import { MessageScreen } from "@/features/guard/MessageScreen";
 import { AppsScreen } from "@/features/home/AppsScreen";
@@ -22,7 +22,7 @@ const SCREENS: Record<ScreenName, ComponentType<{ navigate: Navigate; intent?: T
   call: CallScreen,
   message: MessageScreen,
   cobrowse: SecureSessionScreen,
-  selfie: SelfieGuideScreen,
+  selfie: BiometricsScreen,
   medicine: MedicineScreen,
   bank: BankScreen,
   routine: RoutineScreen,
