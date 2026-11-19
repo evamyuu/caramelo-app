@@ -33,7 +33,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 
 .footer { display: flex; align-items: center; gap: 16px; margin-top: 14px; width: 100%; }
 .footer__avatar { width: 84px; height: 84px; border-radius: 50%; background: var(--halo); display: grid; place-items: center; box-shadow: 0 0 34px var(--halo); flex: none; }
-.footer__avatar svg { width: 72px; height: 72px; display: block; }
+.footer__avatar .avatar { width: 72px; height: 72px; display: block; }
 .footer__hint { font-size: 17px; font-weight: 500; line-height: 1.3; }
 .footer__hint span { display: block; color: var(--accent); }
 
@@ -65,7 +65,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .listening { display: grid; place-items: center; margin: 22px 0 6px; }
 .listening__rings { width: 210px; height: 210px; border-radius: 50%; background: rgb(255 255 255 / 0.45); display: grid; place-items: center; }
 .listening__rings > div { width: 168px; height: 168px; border-radius: 50%; background: rgb(255 255 255 / 0.7); display: grid; place-items: center; }
-.listening__rings svg { width: 126px; height: 126px; }
+.listening__rings .avatar { width: 126px; height: 126px; display: block; }
 .wave { display: flex; gap: 5px; align-items: center; justify-content: center; height: 44px; }
 .wave i { width: 4px; border-radius: 2px; background: var(--accent); animation: wave 1s ease-in-out infinite; }
 @keyframes wave { 0%, 100% { height: 8px; } 50% { height: 38px; } }
