@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Checklist, type ChecklistItem } from "@/components/Checklist";
 import { Screen } from "@/components/Screen";
@@ -10,19 +10,28 @@ interface GuideScreenProps {
   url: string;
   steps: string[];
   navigate: Navigate;
+  /** Called once when the user finishes the last step. */
+  onFinished?: () => void;
 }
 
 /**
  * Guide mode: the user does the task in their own browser while Caramelo reads
  * each step aloud. Fallback when a site refuses the secure room.
  */
-export function GuideScreen({ speech, url, steps, navigate }: GuideScreenProps) {
+export function GuideScreen({ speech, url, steps, navigate, onFinished }: GuideScreenProps) {
   const [current, setCurrent] = useState(-1); // -1: the site is not open yet
   const finished = current >= steps.length;
 
   useEffect(() => {
     if (current >= 0 && current < steps.length) speak(steps[current]);
   }, [current, steps]);
+  const reported = useRef(false); // effects run twice in development; report the finish once
+  useEffect(() => {
+    if (finished && !reported.current) {
+      reported.current = true;
+      onFinished?.();
+    }
+  }, [finished, onFinished]);
 
   const items: ChecklistItem[] = steps.map((label, index) => ({
     label,

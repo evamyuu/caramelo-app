@@ -1,0 +1,57 @@
+/* Partner dashboard. Desktop-first; series colour validated with the dataviz palette checker. */
+body.is-partner-view { display: block; }
+.dash {
+  --d-bg: #f6f3ef; --d-surface: #fcfcfb; --d-ink: #2a2438; --d-ink-soft: #4a4458; --d-muted: #6e6880;
+  --d-grid: #e6e1da; --d-series: #9a5b1e; --d-serious: #a3170a; --d-serious-bg: #fde3df; --d-note: #fbecc4;
+  min-height: 100dvh; width: 100%; padding: 32px clamp(16px, 4vw, 48px) 48px; background: var(--d-bg); color: var(--d-ink);
+  font-family: var(--font);
+}
+@media (prefers-color-scheme: dark) {
+  .dash {
+    --d-bg: #141218; --d-surface: #1c1a22; --d-ink: #f1edf6; --d-ink-soft: #cfc8da; --d-muted: #a59eb3;
+    --d-grid: #2e2b36; --d-series: #c98236; --d-serious: #ff8a7a; --d-serious-bg: #3a1d1a; --d-note: #3a3020;
+  }
+}
+.dash__header { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; }
+.dash__header h1 { font-size: 28px; font-weight: 600; }
+.dash__header p { color: var(--d-ink-soft); margin-top: 6px; max-width: 60ch; }
+.dash__filters { display: flex; gap: 6px; }
+.dash__filters button { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--d-grid); color: var(--d-ink-soft); background: var(--d-surface); font-weight: 600; }
+.dash__filters button.is-active { background: var(--d-ink); color: var(--d-bg); border-color: var(--d-ink); }
+.dash__note { background: var(--d-note); border-radius: 12px; padding: 10px 14px; margin-bottom: 18px; font-size: 14px; color: var(--d-ink-soft); }
+.dash__tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 14px; }
+.dash__stat, .dash__card { background: var(--d-surface); border-radius: 18px; padding: 18px 20px; }
+.dash__stat { display: flex; flex-direction: column; gap: 4px; }
+.dash__stat-label { font-size: 14px; color: var(--d-muted); font-weight: 600; }
+.dash__stat-value { font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.dash__stat-detail { font-size: 13px; color: var(--d-muted); }
+.dash__card { margin-bottom: 14px; }
+.dash__card h2 { font-size: 17px; font-weight: 600; margin-bottom: 12px; }
+.dash__card-head { display: flex; justify-content: space-between; align-items: baseline; }
+.dash__link { color: var(--d-ink-soft); text-decoration: underline; text-underline-offset: 3px; font-size: 14px; }
+.dash__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+.dash__grid .dash__card { margin-bottom: 0; }
+.dash__waves { list-style: none; padding: 0; display: grid; gap: 8px; }
+.dash__waves li { background: var(--d-serious-bg); border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; }
+.dash__waves strong { color: var(--d-serious); }
+.dash__wave-icon { flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--d-serious); color: var(--d-surface); font-weight: 700; font-size: 13px; display: grid; place-items: center; }
+.dash__chart { width: 100%; height: auto; display: block; overflow: visible; }
+.dash__grid-line { stroke: var(--d-grid); stroke-width: 1; }
+.dash__axis { fill: var(--d-muted); font-size: 11px; }
+.dash__value { fill: var(--d-ink); font-size: 12px; font-weight: 600; }
+.dash__mark { fill: var(--d-series); }
+.dash__hit { fill: transparent; }
+.dash__hit:hover { fill: color-mix(in srgb, var(--d-ink) 6%, transparent); }
+.dash__rank { list-style: none; padding: 0; display: grid; gap: 8px; }
+.dash__rank li { display: grid; grid-template-columns: 40px 1fr 48px; gap: 10px; align-items: center; padding: 2px 0; cursor: default; }
+.dash__rank--wide li { grid-template-columns: minmax(0, 190px) 1fr 48px; }
+.dash__rank li:hover .dash__rank-label { color: var(--d-ink); }
+.dash__rank-label { font-size: 14px; color: var(--d-ink-soft); }
+.dash__rank-track { height: 14px; }
+.dash__rank-bar { display: block; height: 100%; min-width: 2px; background: var(--d-series); border-radius: 0 4px 4px 0; }
+.dash__rank-value { font-size: 14px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+.dash__table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.dash__table th, .dash__table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--d-grid); }
+.dash__table th { color: var(--d-muted); font-weight: 600; }
+.dash__empty { color: var(--d-muted); }
+.dash__tip { position: fixed; z-index: 10; pointer-events: none; background: var(--d-ink); color: var(--d-bg); padding: 8px 10px; border-radius: 8px; font-size: 13px; line-height: 1.4; }

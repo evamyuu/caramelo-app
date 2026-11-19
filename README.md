@@ -27,6 +27,10 @@ Cada tela segue a mesma estrutura do design: um chip de contexto, uma frase gran
 | Link em sala isolada (a API abre o link num navegador descartável e devolve um veredito) | Real | `features/guard` |
 | Fazer junto (navegação assistida ao vivo via WebSocket, consentimento antes de passos sensíveis, CPF, senha e código digitados só pela pessoa) | Real | `features/cobrowse` |
 | Modo guia (fallback quando o site recusa a sala segura: abre o site oficial no navegador da pessoa e fala cada passo) | Real | `features/cobrowse` |
+| Rotina: "todo dia 5, vê meu pagamento do INSS" vira tarefa agendada; na hora, o Caramelo avisa e faz junto, e sugere rotinas a partir do que a pessoa repete | Real | `features/routine` |
+| Instalar apps: só aplicativo oficial de uma lista conferida, aviso de app falso ("WhatsApp Gold") e página oficial da Play Store | Real (no Android gerenciado, instala sem a loja) | `features/store` |
+| Mapa de golpes para parceiros (Claro, CiX, Febraban), em `?painel` | Real | `features/insights` |
+| Fontes do assistente numa área discreta ("De onde eu tirei isso?") | Real | `features/home` |
 | Selfie guiada (detecção de rosto no aparelho com MediaPipe, nenhuma imagem sai do celular) | Real | `features/documents` |
 | Leitor de remédio (OCR no aparelho com tesseract.js; lê o rótulo, nunca interpreta dosagem) | Real | `features/companion` |
 | Ligação suspeita (score de risco vindo da API) | Score real, ligação simulada | `features/guard` |
