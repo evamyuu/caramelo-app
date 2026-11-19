@@ -25,7 +25,8 @@ Cada tela segue a mesma estrutura do design: um chip de contexto, uma frase gran
 | Funcionalidade | Status | Onde |
 | --- | --- | --- |
 | Link em sala isolada (a API abre o link num navegador descartável e devolve um veredito) | Real | `features/guard` |
-| Fazer junto (navegação assistida ao vivo via WebSocket, consentimento antes de passos sensíveis, senha digitada só pela pessoa) | Real | `features/cobrowse` |
+| Fazer junto (navegação assistida ao vivo via WebSocket, consentimento antes de passos sensíveis, CPF, senha e código digitados só pela pessoa) | Real | `features/cobrowse` |
+| Modo guia (fallback quando o site recusa a sala segura: abre o site oficial no navegador da pessoa e fala cada passo) | Real | `features/cobrowse` |
 | Selfie guiada (detecção de rosto no aparelho com MediaPipe, nenhuma imagem sai do celular) | Real | `features/documents` |
 | Leitor de remédio (OCR no aparelho com tesseract.js; lê o rótulo, nunca interpreta dosagem) | Real | `features/companion` |
 | Ligação suspeita (score de risco vindo da API) | Score real, ligação simulada | `features/guard` |
@@ -138,6 +139,13 @@ npm run typecheck && npm test
 | `npm run typecheck` | Apenas TypeScript |
 
 > Câmera e microfone exigem HTTPS ou `localhost`. Para testar no celular, exponha o servidor de desenvolvimento por um túnel HTTPS e aponte `VITE_API_URL` para a URL pública da API.
+
+---
+
+## 🧭 Próximos Passos
+
+- **Login Único gov.br** - Parceria com o governo para entrar como aplicação credenciada, sem captcha nem automação de tela; o modo guia segue como fallback para os demais sites
+- **App Android** - Alerta de golpe durante a ligação recebida, usando o score de risco que já existe na API
 
 ---
 

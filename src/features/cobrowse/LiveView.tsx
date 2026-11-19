@@ -14,11 +14,11 @@ interface LiveViewProps {
 /** Live picture of the remote browser, with its address bar always visible. */
 export function LiveView({ frame, url, onTap, compact }: LiveViewProps) {
   function handleClick(event: MouseEvent<HTMLImageElement>) {
+    // The picture keeps the remote width and is anchored at the top (a compact view
+    // crops the bottom), so one scale from the width maps both axes.
     const box = event.currentTarget.getBoundingClientRect();
-    onTap?.(
-      Math.round(((event.clientX - box.left) / box.width) * REMOTE_VIEWPORT.width),
-      Math.round(((event.clientY - box.top) / box.height) * REMOTE_VIEWPORT.height),
-    );
+    const scale = REMOTE_VIEWPORT.width / box.width;
+    onTap?.(Math.round((event.clientX - box.left) * scale), Math.round((event.clientY - box.top) * scale));
   }
   return (
     <div className={`live-view${compact ? " live-view--compact" : ""}`}>
