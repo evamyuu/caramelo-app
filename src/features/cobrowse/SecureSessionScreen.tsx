@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { Checklist, type ChecklistItem } from "@/components/Checklist";
 import { Screen } from "@/components/Screen";
+import type { Gesture } from "@/features/documents/faceGuidance";
+import { useFaceCheck } from "@/features/documents/useFaceCheck";
 import { API_URL, completeRoutine, createRoutine, recordActivity } from "@/lib/api";
 import type { Navigate, Routine, TaskIntent } from "@/lib/types";
 
@@ -30,6 +32,12 @@ const TASKS: Task[] = [
     task: "Ver minha restituição",
     url: `${API_URL}/demo/service/`,
     scriptedPlan: ["entrar", "consultar restituição"],
+  },
+  {
+    title: "Fazer minha prova de vida (site de teste)",
+    task: "Fazer a minha prova de vida",
+    url: `${API_URL}/demo/service/`,
+    scriptedPlan: ["entrar", "prova de vida", "enviar"],
   },
 ];
 const PLAN = ["Abrir o site numa sala segura", "Você entra com os seus dados", "Eu leio o resultado pra você"];
@@ -130,6 +138,10 @@ export function SecureSessionScreen({ navigate, intent }: { navigate: Navigate; 
     );
   }
 
+  if (state.phase === "biometric") {
+    return <LiveFaceCheck gestures={state.gestures} onDone={session.sendFace} onGuide={session.requestGuide} />;
+  }
+
   if (state.phase === "guide" && state.guide) {
     return <GuideScreen speech={state.speech} url={state.guide.url} steps={state.guide.steps} navigate={navigate}
       onFinished={reportCompletion} />;
@@ -162,6 +174,26 @@ export function SecureSessionScreen({ navigate, intent }: { navigate: Navigate; 
       <div className="stack">
         {state.speech && <div className="card"><div className="card__label card__label--accent">Caramelo diz</div>{state.speech}</div>}
         <Checklist items={steps} />
+      </div>
+    </Screen>
+  );
+}
+
+/**
+ * The site asked for a face photo: Caramelo stays with the person on their own camera,
+ * one instruction at a time, and hands the photo to the site only when everything passed.
+ */
+function LiveFaceCheck({ gestures, onDone, onGuide }: { gestures: Gesture[]; onDone: (photo: string | null) => void; onGuide: () => void }) {
+  const check = useFaceCheck(gestures, onDone);
+  return (
+    <Screen mood={check.guidance.ok ? "success" : "consent"} avatar={check.guidance.ok ? "calm" : "alert"}
+      chip="Biometria · ao vivo com você" title={check.gesturing ? "Agora o gesto." : "Rosto no lugar."} speech={check.message}
+      hint={["A foto vai só para o site.", "Eu não guardo"]}>
+      <video ref={check.videoRef} className="camera camera--mirrored" playsInline muted />
+      <div className="stack">
+        <div className="card"><Checklist items={check.items} /></div>
+        <button className="link" onClick={() => onDone(null)}>Parar por aqui</button>
+        <button className="link" onClick={onGuide}>Prefiro fazer no meu celular</button>
       </div>
     </Screen>
   );

@@ -1,23 +1,15 @@
-import { FaceLandmarker, FilesetResolver, type NormalizedLandmark } from "@mediapipe/tasks-vision";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
-import { Checklist, type ChecklistItem } from "@/components/Checklist";
+import { Checklist } from "@/components/Checklist";
 import { Icon } from "@/components/Icon";
 import { Screen } from "@/components/Screen";
 import { launchUrl, OFFICIAL_APPS, type OfficialApp } from "@/features/store/catalog";
-import { useCamera } from "@/hooks/useCamera";
-import { speak } from "@/lib/speech";
 import type { Navigate } from "@/lib/types";
 
-import { type FaceSignals, GESTURES, gestureDone, guideFace, guideLight, type Guidance, yawFrom } from "./faceGuidance";
+import { GESTURES } from "./faceGuidance";
+import { useFaceCheck } from "./useFaceCheck";
 
-const WASM_URL = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm";
-const MODEL_URL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
-const DETECTION_INTERVAL_MS = 250;
-const STEADY_FRAMES = 5; // about a second well framed and lit before the gestures start
-const NOSE_TIP = 1;
-const FACE_LEFT = 234;
-const FACE_RIGHT = 454;
+const ALL_GESTURES = GESTURES.map(({ gesture }) => gesture);
 
 /** Services whose sign-in or proof of life uses a face check. */
 const SERVICES: { app: OfficialApp; why: string }[] = [
@@ -89,121 +81,17 @@ export function BiometricsScreen({ navigate }: { navigate: Navigate }) {
 
 /** Camera practice: framing and light first, then each liveness gesture in turn. */
 function Practice({ onDone, onCancel }: { onDone: () => void; onCancel: () => void }) {
-  const { videoRef, ready, error } = useCamera("user");
-  const [guidance, setGuidance] = useState<Guidance>({ ok: false, message: "Abrindo a câmera. Segure o celular na altura do rosto." });
-  const [step, setStep] = useState(-1); // -1: framing; then index into GESTURES
-  const progress = useRef({ steady: 0, step: -1 });
-  const lastSpoken = useRef("");
-
-  useEffect(() => {
-    if (!ready) return;
-    let landmarker: FaceLandmarker | undefined;
-    let timer: number | undefined;
-    let cancelled = false;
-    const canvas = document.createElement("canvas");
-    canvas.width = 32;
-    canvas.height = 24;
-    const context = canvas.getContext("2d", { willReadFrequently: true });
-
-    (async () => {
-      const vision = await FilesetResolver.forVisionTasks(WASM_URL);
-      landmarker = await FaceLandmarker.createFromOptions(vision, {
-        baseOptions: { modelAssetPath: MODEL_URL }, runningMode: "VIDEO", numFaces: 2, outputFaceBlendshapes: true,
-      });
-      if (cancelled) return landmarker.close();
-      timer = window.setInterval(() => {
-        const video = videoRef.current;
-        if (!video || !landmarker || !video.videoWidth) return;
-        const result = landmarker.detectForVideo(video, performance.now());
-        const width = video.videoWidth;
-        const height = video.videoHeight;
-        const boxes = result.faceLandmarks.map((points) => boxOf(points, width, height));
-        let next = guideFace(boxes, width, height);
-        if (next.ok && context) next = guideLight(lighting(context, video, boxes[0], width, height)) ?? next;
-
-        const state = progress.current;
-        if (state.step < 0) {
-          state.steady = next.ok ? state.steady + 1 : 0;
-          if (state.steady >= STEADY_FRAMES) state.step = 0;
-        } else if (next.ok || boxes.length === 1) {
-          const signals = signalsOf(result.faceBlendshapes[0]?.categories ?? [], result.faceLandmarks[0]);
-          if (gestureDone(GESTURES[state.step].gesture, signals)) state.step += 1;
-        }
-        if (state.step >= GESTURES.length) {
-          speak("Muito bem! Treino feito.");
-          window.clearInterval(timer);
-          onDone();
-          return;
-        }
-        setStep(state.step);
-        setGuidance(state.step >= 0 ? { ok: true, message: GESTURES[state.step].ask } : next);
-      }, DETECTION_INTERVAL_MS);
-    })().catch(() => setGuidance({ ok: false, message: "Não consegui ligar o guia da câmera." }));
-    return () => { cancelled = true; window.clearInterval(timer); landmarker?.close(); };
-  }, [ready, videoRef, onDone]);
-
-  useEffect(() => {
-    if (guidance.message === lastSpoken.current) return;
-    lastSpoken.current = guidance.message;
-    speak(guidance.message);
-  }, [guidance]);
-
-  const items: ChecklistItem[] = [
-    { label: "Rosto no lugar e luz boa", status: step >= 0 ? "done" : "active" },
-    ...GESTURES.map(({ gesture }, index): ChecklistItem => ({
-      label: { blink: "Piscar", smile: "Sorrir", turn: "Virar o rosto" }[gesture],
-      status: step > index ? "done" : step === index ? "active" : "pending",
-    })),
-  ];
+  const check = useFaceCheck(ALL_GESTURES, () => onDone()); // practice only: the photo is dropped
 
   return (
-    <Screen mood={guidance.ok ? "success" : "gov"} avatar={guidance.ok ? "calm" : "alert"} chip="Treino da biometria"
-      title={step >= 0 ? "Agora o gesto." : "Rosto no lugar."}
-      speech={error ? "Preciso que você libere a câmera para eu te guiar." : guidance.message}
+    <Screen mood={check.guidance.ok ? "success" : "gov"} avatar={check.guidance.ok ? "calm" : "alert"} chip="Treino da biometria"
+      title={check.gesturing ? "Agora o gesto." : "Rosto no lugar."} speech={check.message}
       hint={["A sua foto não sai", "do seu celular"]}>
-      <video ref={videoRef} className="camera camera--mirrored" playsInline muted />
+      <video ref={check.videoRef} className="camera camera--mirrored" playsInline muted />
       <div className="stack">
-        <div className="card"><Checklist items={items} /></div>
+        <div className="card"><Checklist items={check.items} /></div>
         <button className="link" onClick={onCancel}>Parar o treino</button>
       </div>
     </Screen>
   );
-}
-
-function boxOf(points: NormalizedLandmark[], width: number, height: number) {
-  const xs = points.map((point) => point.x * width);
-  const ys = points.map((point) => point.y * height);
-  const x = Math.min(...xs);
-  const y = Math.min(...ys);
-  return { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y };
-}
-
-/** Mean luminance of the face and of the whole frame, on a tiny downscaled copy. */
-function lighting(context: CanvasRenderingContext2D, video: HTMLVideoElement, face: ReturnType<typeof boxOf>, width: number, height: number) {
-  const { width: w, height: h } = context.canvas;
-  context.drawImage(video, 0, 0, w, h);
-  const data = context.getImageData(0, 0, w, h).data;
-  const left = Math.floor((face.x / width) * w);
-  const right = Math.ceil(((face.x + face.width) / width) * w);
-  const top = Math.floor((face.y / height) * h);
-  const bottom = Math.ceil(((face.y + face.height) / height) * h);
-  let faceSum = 0, faceCount = 0, frameSum = 0;
-  for (let py = 0; py < h; py += 1) {
-    for (let px = 0; px < w; px += 1) {
-      const i = (py * w + px) * 4;
-      const luminance = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-      frameSum += luminance;
-      if (px >= left && px < right && py >= top && py < bottom) { faceSum += luminance; faceCount += 1; }
-    }
-  }
-  return { face: faceCount ? faceSum / faceCount : 0, frame: frameSum / (w * h) };
-}
-
-function signalsOf(categories: { categoryName: string; score: number }[], landmarks?: NormalizedLandmark[]): FaceSignals {
-  const score = (name: string) => categories.find((category) => category.categoryName === name)?.score ?? 0;
-  return {
-    blink: Math.min(score("eyeBlinkLeft"), score("eyeBlinkRight")),
-    smile: (score("mouthSmileLeft") + score("mouthSmileRight")) / 2,
-    yaw: landmarks ? yawFrom(landmarks[NOSE_TIP].x, landmarks[FACE_LEFT].x, landmarks[FACE_RIGHT].x) : 0,
-  };
 }

@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { secureSessionUrl } from "@/lib/api";
+import type { Gesture } from "@/features/documents/faceGuidance";
 import { speak } from "@/lib/speech";
 
 /** Size of the remote browser viewport; taps are mapped to these coordinates. */
 export const REMOTE_VIEWPORT = { width: 390, height: 440 };
 
-export type SessionPhase = "plan" | "working" | "consent" | "handover" | "guide" | "done";
+export type SessionPhase = "plan" | "working" | "consent" | "handover" | "biometric" | "guide" | "done";
 
 /** What the user is asked to fill in on their own during a handover. */
 export type HandoverField = "identity" | "password" | "code" | "captcha";
@@ -20,6 +21,8 @@ export interface SecureSessionState {
   steps: string[];
   question: string;
   success: boolean;
+  /** Liveness gestures the site asked for, during a live face check. */
+  gestures: Gesture[];
   /** Guide mode: the official site to open in the user's own browser, and the steps. */
   guide: { url: string; steps: string[] } | null;
 }
@@ -30,11 +33,12 @@ type ServerMessage =
   | { type: "step"; description: string }
   | { type: "consent_request"; question: string }
   | { type: "handover"; field?: HandoverField; speech: string }
+  | { type: "biometric"; gestures: Gesture[]; speech: string }
   | { type: "guide"; speech: string; url: string; steps: string[] }
   | { type: "done"; success: boolean; result: string };
 
 const INITIAL: SecureSessionState = {
-  phase: "plan", field: "password", frame: null, url: "", speech: "", steps: [], question: "", success: false, guide: null,
+  phase: "plan", field: "password", frame: null, url: "", speech: "", steps: [], question: "", success: false, gestures: [], guide: null,
 };
 
 /** Pure reducer from a server message to the next UI state. */
@@ -45,6 +49,7 @@ function reduce(state: SecureSessionState, message: ServerMessage): SecureSessio
     case "step": return { ...state, steps: [...state.steps, message.description] };
     case "consent_request": return { ...state, phase: "consent", question: message.question };
     case "handover": return { ...state, phase: "handover", field: message.field ?? "password", speech: message.speech };
+    case "biometric": return { ...state, phase: "biometric", gestures: message.gestures, speech: message.speech };
     case "guide": return { ...state, phase: "guide", speech: message.speech, guide: { url: message.url, steps: message.steps } };
     case "done": return { ...state, phase: "done", speech: message.result, success: message.success };
   }
@@ -69,7 +74,7 @@ export function useSecureSession() {
     connection.onopen = () => connection.send(JSON.stringify({ task, url, scripted_plan: scriptedPlan }));
     connection.onmessage = (event) => {
       const message = JSON.parse(event.data as string) as ServerMessage;
-      if (message.type === "speech" || message.type === "handover" || message.type === "guide") speak(message.speech);
+      if (message.type === "speech" || message.type === "handover" || message.type === "biometric" || message.type === "guide") speak(message.speech);
       if (message.type === "consent_request") speak(message.question);
       if (message.type === "done") speak(message.result);
       setState((current) => reduce(current, message));
@@ -89,6 +94,11 @@ export function useSecureSession() {
     finishHandover: () => {
       if (state.field !== "captcha") send({ type: "key", special: "Enter" });
       send({ type: "ready" });
+      setState((s) => ({ ...s, phase: "working" }));
+    },
+    /** Live face check finished on the device: the photo goes to the site's field, never kept here. */
+    sendFace: (image: string | null) => {
+      send(image ? { type: "face", image } : { type: "stop" });
       setState((s) => ({ ...s, phase: "working" }));
     },
     stop: () => send({ type: "stop" }),

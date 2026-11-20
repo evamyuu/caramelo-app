@@ -31,7 +31,8 @@ Cada tela segue a mesma estrutura do design: um chip de contexto, uma frase gran
 | Instalar apps: só aplicativo oficial de uma lista conferida, aviso de app falso ("WhatsApp Gold") e página oficial da Play Store | Real (no Android gerenciado, instala sem a loja) | `features/store` |
 | Mapa de golpes para parceiros (Claro, CiX, Febraban), em `?painel` | Real | `features/insights` |
 | Fontes do assistente numa área discreta ("De onde eu tirei isso?") | Real | `features/home` |
-| Biometria facial: treino da foto do rosto para gov.br, prova de vida do Meu INSS, CNH do Brasil e CAIXA Tem (enquadramento, luz e gestos de prova de vida: piscar, sorrir, virar o rosto, detectados com MediaPipe no aparelho) e depois o app oficial aberto com as dicas. Nenhuma imagem sai do celular | Real | `features/documents` |
+| Biometria facial ao vivo: quando um serviço pede a foto do rosto no "Fazer junto", o Caramelo fica com a pessoa na câmera e fala cada passo (enquadramento, luz, piscar, sorrir, virar o rosto, detectados com MediaPipe no aparelho); só quando tudo passa a foto vai para o site | Real (Portal Cidadão de teste) | `features/cobrowse`, `features/documents` |
+| Treino da biometria para gov.br, prova de vida do Meu INSS, CNH do Brasil e CAIXA Tem, e depois o app oficial aberto com as dicas. A foto do treino não sai do celular | Real | `features/documents` |
 | Leitor de remédio (OCR no aparelho com tesseract.js; lê o rótulo, nunca interpreta dosagem) | Real | `features/companion` |
 | Ligação suspeita (score de risco vindo da API) | Score real, ligação simulada | `features/guard` |
 | Saldo do banco (payload de Open Finance, somente leitura) | Simulado | `features/companion` |
@@ -150,6 +151,7 @@ npm run typecheck && npm test
 
 - **Login Único gov.br** - Parceria com o governo para entrar como aplicação credenciada, sem captcha nem automação de tela; o modo guia segue como fallback para os demais sites
 - **App Android** - Alerta de golpe durante a ligação recebida, usando o score de risco que já existe na API
+- **Biometria dentro dos apps oficiais** - No app Android gerenciado, um serviço de acessibilidade lê o que o app oficial pede na tela ("pisque", "aproxime o rosto") e o Caramelo fala junto, numa bolha por cima; a câmera continua sendo do app oficial
 
 ---
 
